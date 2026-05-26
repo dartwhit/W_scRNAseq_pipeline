@@ -76,33 +76,23 @@ This pipeline processes scRNA-seq data from public repositories (e.g., GEO datas
    cd W_scRNAseq_pipeline
    ```
 
-2. **Install Python dependencies**:
+2. **Create and activate a Conda environment**:
    ```bash
-   pip install snakemake pyyaml pandas pysradb
+   conda env create -f environment.yml
+   conda activate scrna_pipeline
    ```
 
-3. **Install R packages**:
+3. **Install CAMML (not available in Conda channels)**:
    ```R
-   install.packages(c("Seurat", "yaml", "ggplot2", "dplyr", "pheatmap"))
-   if (!requireNamespace("BiocManager", quietly = TRUE))
-       install.packages("BiocManager")
-   BiocManager::install(c("SingleR", "celldex", "scDblFinder", "SingleCellExperiment"))
-   
-   # Install CAMML
    devtools::install_github("Chenmengpin/CAMML")
    ```
 
-4. **Install fastq-dl**:
-   ```bash
-   pip install fastq-dl
-   ```
-
-5. **Install Cell Ranger**:
+4. **Install Cell Ranger**:
    - Download from [10x Genomics](https://www.10xgenomics.com/support/software/cell-ranger/downloads)
    - Follow installation instructions for your system
    - Ensure Cell Ranger is available in your PATH or load as a module
 
-6. **Download Reference Genome**:
+5. **Download Reference Genome**:
    ```bash
    cd references
    wget https://cf.10xgenomics.com/supp/cell-exp/refdata-gex-GRCh38-2024-A.tar.gz
@@ -157,6 +147,12 @@ python make_config.py <GEO_ACCESSION>
 ```
 
 ## 💻 Usage
+
+Before running commands below, activate the Conda environment:
+
+```bash
+conda activate scrna_pipeline
+```
 
 ### Basic Usage
 
