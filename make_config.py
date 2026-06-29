@@ -16,8 +16,8 @@ def fetch_sra_metadata(geo_id):
     # Extract relevant columns
     metadata = metadata[["experiment_alias", "run_accession"]]
 
-    # Map sample names to SRR IDs
-    samples = dict(zip(metadata["experiment_alias"], metadata["run_accession"]))
+    # Map sample names to SRR IDs (list per GSM to handle multiple runs per sample)
+    samples = metadata.groupby("experiment_alias")["run_accession"].apply(list).to_dict()
 
     return samples
 
@@ -29,7 +29,7 @@ def create_config(geo_id, output_file="config.yaml"):
     samples = fetch_sra_metadata(geo_id)
 
     # Reference genome (modify as needed)
-    reference_genome = "/data/references/refdata-cellranger-GRCh38-2020-A"
+    reference_genome = "references/refdata-gex-GRCh38-2024-A"
 
     # Build config structure
     config_data = {
