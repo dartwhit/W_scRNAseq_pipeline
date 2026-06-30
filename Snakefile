@@ -46,6 +46,10 @@ rule all:
 
 
 rule download_and_rename_fastq:
+    threads: 4
+    resources:
+        mem_mb=16000,
+        runtime=180
     output:
         r1="datasets/{dataset}/fastq/{gsm}_S1_L{lane}_R1_001.fastq.gz",
         r2="datasets/{dataset}/fastq/{gsm}_S1_L{lane}_R2_001.fastq.gz"
@@ -58,7 +62,7 @@ rule download_and_rename_fastq:
         mkdir -p {params.fastq_dir}
 
         # Download FASTQ files using fastq-dl
-        fastq-dl -a {params.sra_id} --cpus 8 --outdir {params.fastq_dir} || (echo "fastq-dl failed" && exit 1)
+        fastq-dl -a {params.sra_id} --cpus {threads} --outdir {params.fastq_dir} || (echo "fastq-dl failed" && exit 1)
 
         # Rename downloaded files to match Cell Ranger's expected format
         mv {params.fastq_dir}/{params.sra_id}_1.fastq.gz {output.r1}
@@ -67,6 +71,10 @@ rule download_and_rename_fastq:
 
 
 rule cellranger:
+    threads: 16
+    resources:
+        mem_mb=128000,
+        runtime=1440
     input:
         lambda wildcards: expand(
             "datasets/{dataset}/fastq/{gsm}_S1_L{lane}_R{read}_001.fastq.gz",
@@ -87,6 +95,8 @@ rule cellranger:
         cellranger count --id={wildcards.gsm} \
                          --transcriptome={params.reference} \
                          --fastqs=datasets/{wildcards.dataset}/fastq/ \
+                         --localcores={threads} \
+                         --localmem=120 \
                          --create-bam false \
                          --sample={wildcards.gsm}
 
@@ -100,6 +110,10 @@ rule cellranger:
 
 
 rule process_seurat:
+    threads: 8
+    resources:
+        mem_mb=64000,
+        runtime=720
     input:
         expand("datasets/{dataset}/cellranger_output/{gsm}/outs/filtered_feature_bc_matrix",
                dataset=dataset,
