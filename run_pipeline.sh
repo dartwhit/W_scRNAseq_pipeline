@@ -9,7 +9,7 @@
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=f005c3n@dartmouth.edu
 
-set -euo pipefail
+set -eo pipefail
 
 # Defaults (can be overridden via CLI args)
 DATASET="GSE264508"
@@ -57,7 +57,11 @@ echo "Max parallel jobs: ${MAX_JOBS}"
 
 mkdir -p logs logs/slurm
 
+# Some cluster /etc/bashrc files reference variables before defining them.
+# Temporarily disable nounset while sourcing startup files, then re-enable.
+set +u
 source ~/.bashrc
+set -u
 conda activate scrna_pipeline
 
 DATASET=${DATASET} snakemake \
