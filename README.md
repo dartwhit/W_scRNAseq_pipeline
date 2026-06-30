@@ -352,6 +352,39 @@ If you encounter issues:
    - Dataset being processed
    - System information
 
+### Check Previous Run Status (Per Sample)
+
+Use the reusable status script to see which stages completed and which failed/missed outputs.
+
+Generate a report for a dataset:
+
+```bash
+python scripts/report_run_status.py --dataset GSE264508
+```
+
+This writes a TSV report to:
+
+```text
+datasets/GSE264508/status/GSE264508_run_status.tsv
+```
+
+You can also override paths:
+
+```bash
+python scripts/report_run_status.py \
+   --dataset GSE264508 \
+   --config config.yaml \
+   --base-dir . \
+   --snakemake-log-dir .snakemake/log \
+   --output datasets/GSE264508/status/custom_status.tsv
+```
+
+Report columns:
+- `download_fastq_status`: `ok`, `partial`, or `missing` based on expected lane FASTQs from `config.yaml`
+- `cellranger_status`: `ok` when `outs/filtered_feature_bc_matrix` exists for a sample
+- `process_seurat_status`: dataset-level stage status (`ok`, `partial`, `missing`) based on final Seurat outputs
+- `failure_hints`: best-effort hints parsed from recent Snakemake logs in `.snakemake/log`
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please:
